@@ -1,0 +1,55 @@
+<?php
+// module/Album/view/album/album/edit.phtml:
+
+$title = 'Sửa';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+
+<?php
+$sanPham = $this->form;
+die(var_dump($sanPham->get('tenSanPham')));
+$form->setAttribute('action', $this->url(
+    'db_doctrine',
+    array(
+        'action' => 'edit',
+        'id'     => $this->id,
+    )
+));
+$form->prepare();
+
+echo $this->form()->openTag($form);
+//echo $this->formHidden($form->get('id'));
+?>
+<table class="table">
+	<tr>
+		<td>Tên sản phẩm </br>
+			<?php echo $this->formElement($sanPham->get('tenSanPham')); ?></td>
+	</tr>
+	<tr>
+		<td>Loại</br>
+			<?php 
+				$donViTinh=$sanPham->get('idDonViTinh');
+				$donViTinh->setValueOptions($this->MakeArrayOptionDonViTinh($donViTinhs));
+				echo $this->formElement($donViTinh);
+			?>
+		</td>
+	</tr>
+	<tr>
+		<td>Đơn vị tính</br>
+			<?php 
+				$loai=$sanPham->get('idLoai');
+				$loai->setValueOptions($this->MakeArrayOptionLoai($loais));
+				echo $this->formElement($loai);				
+			?>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<?php 
+				echo $this->formSubmit($form->get('submit'));
+				echo $this->form()->closeTag();
+			?>
+		</td>
+	</tr>
+</table>
