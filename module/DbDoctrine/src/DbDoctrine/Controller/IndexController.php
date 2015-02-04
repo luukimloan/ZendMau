@@ -13,14 +13,14 @@ class IndexController extends AbstractActionController
 {
     private $entityManager;
   
-  public function getEntityManager()
-  {
-     if(!$this->entityManager)
-     {
-      $this->entityManager=$this->getServiceLocator()->get('Doctrine\ORM\EntityManager');
-     }
-     return $this->entityManager;
-  }
+    public function getEntityManager()
+    {
+        if(!$this->entityManager)
+        {
+            $this->entityManager=$this->getServiceLocator()->get('Doctrine\ORM\EntityManager');
+        }
+        return $this->entityManager;
+    }
 
     public function indexAction()
     {
@@ -71,19 +71,24 @@ class IndexController extends AbstractActionController
         $form = new UpdateSanPhamForm($entityManager);
         $form->bind($sanPham);
 
+        $donViTinhs=$entityManager->getRepository('DbDoctrine\Entity\DonViTinh')->findAll();
+        $loais=$entityManager->getRepository('DbDoctrine\Entity\Loai')->findAll();
+
         $request = $this->getRequest();        
         if ($request->isPost()) {            
-            $form->setData($request->getPost());            
+            $form->setData($request->getPost()); 
             if ($form->isValid()) 
             {
                 $entityManager->flush();                
                 $this->flashMessenger()->addMessage('Cập nhật thành công!');
-                return $this->redirect()->toRoute('db_doctrine/crud',array('action'=>'edit','id'=>$id));
+                return $this->redirect()->toRoute('db_doctrine');
             }
         }
 
         return array(
-            'form' => $form,
+            'form' => $form,            
+            'donViTinhs'=>$donViTinhs,
+            'loais'=>$loais,
             'id'=>$id,
             'kiemTraTenSanPham'=>0,
         );
@@ -91,6 +96,23 @@ class IndexController extends AbstractActionController
 	
     public function deleteAction()
     {
-        
+        $entityManager=$this->getEntityManager();      
+        $id=(int)$this->params()->fromRoute('id',0);
+        if(!$id)
+        {
+            return $this->redirect()->toRoute('db_doctrine');
+        }
+
+        $sanPham=$entityManager->getRepository('DbDoctrine\Entity\SanPham')->find($id);
+        if($sanPham)
+        {
+            $entityManager->remove($sanPham);      
+            $entityManager->flush();             
+        }
+        else
+        {
+            $this->flashMessenger()->addMessage('Không tìm thấy sản phẩm!');
+        }             
+        return $this->redirect()->toRoute('db_doctrine');
     }
 }

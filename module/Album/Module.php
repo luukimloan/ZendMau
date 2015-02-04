@@ -1,11 +1,9 @@
 <?php
-namespace DbMau;
+namespace Album;
 
 // Add these import statements:
-use DbMau\Model\SanPham;
-use DbMau\Model\SanPhamTable;
-use DbMau\Model\DonViTinh;
-use DbMau\Model\DonViTinhTable;
+use Album\Model\Album;
+use Album\Model\AlbumTable;
 use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\TableGateway\TableGateway;
 
@@ -79,7 +77,7 @@ class Module implements
         $sharedEvents->attach(__NAMESPACE__, 'dispatch', function($e) {
             // This event will only be fired when an ActionController under the MyModule namespace is dispatched.
             $controller = $e->getTarget();
-            $controller->layout('layout/db_mau');
+            $controller->layout('layout/album'); // points to module/Album/view/layout/album.phtml
         }, 100);
     }
 	
@@ -98,53 +96,26 @@ class Module implements
         );
     }
 
+
+
+    // Add this method:
     public function getServiceConfig()
     {
-       return array(
-          'factories' => array(
-             'SanPhamTableGateway' => function ($sm) {
-                 //Goi doi tuong ket noi voi Database
-                 $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                       
-                 //Goi doi tuong giup chung ta chuyen 1 doi tuong mảng thanh mot doi tuong
-                 $resultSetPrototype = new ResultSet();
-                 $resultSetPrototype->setArrayObjectPrototype(new SanPham());
-                 //$resultSetPrototype = null;
-                 //Dua cac gia tri 'users', $dbAdapter, $resultSetPrototype
-                 //vao doi tuong Zend\Db\TableGateway
-                 return new TableGateway('san_pham', $dbAdapter, null, $resultSetPrototype);
-             },
-             
-             'DbMau\Model\SanPhamTable' =>  function($sm) {
-                 //Luc nao SanPhamTableGateway la mot doi tuong cua Zend\Db\TableGateway
-                 //chua cac gia tri ket noi den database va bang chung ta muon truy van
-                 $tableGateway = $sm->get('SanPhamTableGateway');
-                          
-                 //Truyen doi tuong Zend\Db\TableGateway vao trong ham __construct()
-                 //cua doi tuong DbMau\Model\SanPhamTable
-                 $table = new SanPhamTable($tableGateway);
-                 return $table;
-             },
-
-             'ZendDbAdapter' => function($sm){
-                $adapter = $sm->get('Zend\Db\Adapter\Adapter');
-                return $adapter;
-             },
-/*
-             'DonViTinhTableGateway' => function ($sm) {                 
-                 $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                 $resultSetPrototype = new ResultSet();
-                 $resultSetPrototype->setArrayObjectPrototype(new DonViTinh());
-                 return new TableGateway('don_vi_tinh', $dbAdapter, null, $resultSetPrototype);
-             },
-             
-             'DbMau\Model\DonViTinhTable' =>  function($sm) {
-                 $tableGateway = $sm->get('DonViTinhTableGateway');
-                 $table = new DonViTinhTable($tableGateway);
-                 return $table;
-             },*/
-          ),
-       );
+        return array(
+            'factories' => array(
+                'Album\Model\AlbumTable' =>  function($sm) {
+                    $tableGateway = $sm->get('AlbumTableGateway');
+                    $table = new AlbumTable($tableGateway);
+                    return $table;
+                },
+                'AlbumTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new Album());
+                    return new TableGateway('album', $dbAdapter, null, $resultSetPrototype);
+                },
+            ),
+        );
     }
 
 } 

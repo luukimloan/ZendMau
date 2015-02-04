@@ -3,95 +3,149 @@ namespace DbMau\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
-use DbMau\Form\DbMauForm;
+use DbMau\Model\SanPham; 
+use DbMau\Model\SanPhamTable;           
+use DbMau\Form\SanPhamForm;   
+use Zend\Db\Sql\Sql; 
+
+use DbMau\Model\DonViTinh;
+use DbMau\Model\DonViTinhTable;
+use DbMau\Model\Loai;
+use DbMau\Model\LoaiTable;
+use Zend\Db\ResultSet\ResultSet;
+use Zend\Db\TableGateway\TableGateway;
+use Zend\Db\Sql\Select;
 
 class IndexController extends AbstractActionController
 {
-    public function indexAction()
-    {
-        return array(
-        );
+
+    protected $sanPhamTable;
+    protected $donViTinhTable;
+
+    protected $dbAdapter;
+    
+    public function getDbAdapter(){
+        if (!$this->dbAdapter){
+            $sm = $this->getServiceLocator();
+            $adapter = $sm->get('ZendDbAdapter');
+            $this->dbAdapter = $adapter;
+        }
+        return $this->dbAdapter;
     }
 
-    // Add content to this method:
+    public function indexAction()
+    {
+        /*$select = new \Zend\Db\Sql\Select;
+        $select->from('san_pham');
+        $select->columns(array());
+        $select->join('san_pham', "san_pham.id_don_vi_tinh = don_vi_tinh.id_don_vi_tinh");
+         
+        echo $select->getSqlString();
+        $resultSet = $this->tableGateway->selectWith($select);
+       die(var_dump($resultSet));
+        return $resultSet; 
+
+foreach ($resultset as $row) {
+}       */
+        return new ViewModel(array(
+            'sanPhams' => $this->getSanPhamTable()->fetchAll(),
+        ));
+    }
+
     public function addAction()
     {
-        /*$form = new AlbumForm();
-        $form->get('submit')->setValue('Add');
+        $dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
+        $resultSetPrototype= new ResultSet();
 
+        $resultSetPrototype->setArrayObjectPrototype(new DonViTinh());
+        $tableGateway= new TableGateway('don_vi_tinh', $dbAdapter, null, $resultSetPrototype);
+        $donViTinhTable= new DonViTinhTable($tableGateway);
+
+        $resultSetPrototypeLoai= new ResultSet();
+        $resultSetPrototypeLoai->setArrayObjectPrototype(new Loai());
+        $tableGatewayLoai= new TableGateway('loai', $dbAdapter, null, $resultSetPrototypeLoai);
+        $loaiTable= new LoaiTable($tableGatewayLoai);
+
+        $form = new SanPhamForm();
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $album = new Album();
-            $form->setInputFilter($album->getInputFilter());
+            $sanPham = new SanPham();
             $form->setData($request->getPost());
-
             if ($form->isValid()) {
-                $album->exchangeArray($form->getData());
-                $this->getAlbumTable()->saveAlbum($album);
-
-                // Redirect to list of albums
-                return $this->redirect()->toRoute('album');
+                $sanPham->exchangeArray($form->getData());
+                $this->getSanPhamTable()->saveSanPham($sanPham);
+                $this->flashMessenger()->addSuccessMessage('Thêm sản phẩm thành công!');
+                return $this->redirect()->toRoute('db_mau');
             }
         }
-        return array('form' => $form);*/
+        return array(
+            'form' => $form,
+            'donViTinhs'=>$donViTinhTable->fetchAll(),
+            'loais'=>$loaiTable->fetchAll(),
+        );
     }
 
     public function editAction()
     {
-        /*$id = (int) $this->params()->fromRoute('id', 0);
-        if (!$id) {
-            return $this->redirect()->toRoute('album', array(
+        $id = (int) $this->params()->fromRoute('id', 0);
+        if(!$id) {
+            return $this->redirect()->toRoute('db_mau', array(
                 'action' => 'add'
             ));
         }
-        $album = $this->getAlbumTable()->getAlbum($id);
+        $dbAdapter=$this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
+        $resultSetPrototype= new ResultSet();
 
-        $form  = new AlbumForm();
-        $form->bind($album);
-        $form->get('submit')->setAttribute('value', 'Edit');
+        $resultSetPrototype->setArrayObjectPrototype(new DonViTinh());
+        $tableGateway= new TableGateway('don_vi_tinh', $dbAdapter, null, $resultSetPrototype);
+        $donViTinhTable= new DonViTinhTable($tableGateway);
+
+        $resultSetPrototypeLoai= new ResultSet();
+        $resultSetPrototypeLoai->setArrayObjectPrototype(new Loai());
+        $tableGatewayLoai= new TableGateway('loai', $dbAdapter, null, $resultSetPrototypeLoai);
+        $loaiTable= new LoaiTable($tableGatewayLoai);
+
+
+        $sanPham = $this->getSanPhamTable()->getSanPham($id);
+
+        $form  = new SanPhamForm();
+        $form->bind($sanPham);
+        $form->get('submit')->setAttribute('value', 'Lưu');
 
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $form->setInputFilter($album->getInputFilter());
             $form->setData($request->getPost());
-
             if ($form->isValid()) {
-                $this->getAlbumTable()->saveAlbum($form->getData());
-
-                // Redirect to list of albums
-                return $this->redirect()->toRoute('album');
+                $this->getSanPhamTable()->saveSanPham($form->getData());
+                $this->flashMessenger()->addSuccessMessage('Cập nhật sản phẩm thành công!');
+                return $this->redirect()->toRoute('db_mau');
             }
         }
-
         return array(
             'id' => $id,
             'form' => $form,
-        );*/
+            'donViTinhs'=>$donViTinhTable->fetchAll(),
+            'loais'=>$loaiTable->fetchAll(),
+        );
     }
 	
     public function deleteAction()
     {
-        /*$id = (int) $this->params()->fromRoute('id', 0);
+        $id = (int) $this->params()->fromRoute('id', 0);
         if (!$id) {
-            return $this->redirect()->toRoute('album');
+            return $this->redirect()->toRoute('db_mau');
         }
+        $this->getSanPhamTable()->deleteSanPham($id);
+        $this->flashMessenger()->addSuccessMessage('Xóa sản phẩm thành công!');
+        return $this->redirect()->toRoute('db_mau');
+    }
 
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $del = $request->getPost('del', 'No');
-
-            if ($del == 'Yes') {
-                $id = (int) $request->getPost('id');
-                $this->getAlbumTable()->deleteAlbum($id);
-            }
-
-            // Redirect to list of albums
-            return $this->redirect()->toRoute('album');
+    public function getSanPhamTable()
+    {
+        if (!$this->sanPhamTable) {
+            $sm = $this->getServiceLocator();
+            $this->sanPhamTable = $sm->get('DbMau\Model\SanPhamTable');
         }
-
-        return array(
-            'id'    => $id,
-            'album' => $this->getAlbumTable()->getAlbum($id)
-        );*/
+        return $this->sanPhamTable;
     }
 }

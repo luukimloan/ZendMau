@@ -1,1 +1,90 @@
-<?php echo "Index";?>
+<?php
+    $flash=$this->flashMessenger();
+    $flash->setMessageOpenFormat('<div%s>
+     <button type="button" id="btFm" class="close" data-dismiss="alert" aria-hidden="true">
+         &times;
+     </button>
+     <ul><li>')
+     ->setMessageSeparatorString('</li><li>')
+     ->setMessageCloseString('</li></ul></div>');
+
+     $error=$flash->render('error',   array('alert', 'alert-dismissable', 'alert-danger'));
+     echo $error;
+
+     $info=$flash->render('info',    array('alert', 'alert-dismissable', 'alert-info'));
+     echo $info;
+
+     $default=$flash->render('default', array('alert', 'alert-dismissable', 'alert-warning'));
+     echo $default;
+
+     $success=$flash->render('success', array('alert', 'alert-dismissable', 'alert-success'));
+     echo $success;                     
+    if($error||$success||$info||$default)
+    {
+        echo '
+        <script type="text/javascript">
+            setTimeout(function(){
+                document.getElementById("btFm").click();
+            },5000);
+        </script>';                        
+    }
+?>
+<?php
+$title = 'Sản Phẩm';
+$this->headTitle($title);
+?>
+<h1><?php  echo $this->escapeHtml($title); ?></h1>
+<p>
+    <a href="<?php echo $this->url('db_mau', array('action'=>'add'));?>">Thêm sản phẩm</a>
+</p>
+
+<table class="table">
+<tr>
+    <th>Tên sản phẩm</th>
+    <th>Đơn vị tính</th>
+    <th>Loại</th>
+    <th>&nbsp;</th>
+</tr>
+<?php /*foreach ($sanPhams as $sanPham) 
+{
+    var_dump($sanPham); 
+} die(var_dump('Stop'));*/?>
+
+<?php foreach ($sanPhams as $sanPham) : ?>
+<!-- <tr>
+    <td><?php //echo $this->escapeHtml($sanPham->ten_san_pham);?></td>
+    <td><?php //echo $this->escapeHtml($sanPham->id_don_vi_tinh);?></td>
+    <td><?php //echo $this->escapeHtml($sanPham->id_loai);?></td>
+    <td>
+        <a href="<?php //echo $this->url('db_mau',
+            //array('action'=>'edit', 'id' => $sanPham->id_san_pham));?>">Sửa</a>
+        <a href="<?php //echo $this->url('db_mau',
+            //array('action'=>'delete', 'id' => $sanPham->id_san_pham));?>" onclick="return xacNhanXoa()">Xóa</a>
+    </td>
+</tr> -->
+
+<tr>
+    <td><?php echo $this->escapeHtml($sanPham['ten_san_pham']);?></td>
+    <td><?php echo $this->escapeHtml($sanPham['ten_don_vi_tinh']);?></td>
+    <td><?php echo $this->escapeHtml($sanPham['ten_loai']);?></td>
+    <td>
+        <a href="<?php echo $this->url('db_mau',
+            array('action'=>'edit', 'id' => $sanPham['id_san_pham']));?>">Sửa</a>
+        <a href="<?php echo $this->url('db_mau',
+            array('action'=>'delete', 'id' => $sanPham['id_san_pham']));?>" onclick="return xacNhanXoa()">Xóa</a>
+    </td>
+</tr>
+<?php endforeach; ?>
+</table>
+
+
+<script language="JavaScript">
+    function xacNhanXoa() {
+      var xacNhan=confirm("Bạn thật sự muốn xóa sản phẩm này?");
+      if(xacNhan==true)
+      {
+        return true;
+      }
+      return false;
+    }
+</script>

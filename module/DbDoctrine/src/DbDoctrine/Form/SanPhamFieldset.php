@@ -37,35 +37,61 @@ class SanPhamFieldset extends Fieldset implements InputFilterProviderInterface
                 'placeholder'=>'Tên sản phẩm',
             ),
          ));
-                  
 
          $this->add(array(
-             'name' => 'idLoai',
-             'type' => '\Zend\Form\Element\Select',
-             'options' => array(
-                 'label' => 'Loại',
-                 'empty_option'=>'----------Chọn Loại Sản Phẩm----------',
-                 'disable_inarray_validator' => true,
-             ),
-             'attributes'=>array('required'=>'required'),
-         ));
-       
+           'name' => 'idLoai',
+           'type' => 'DoctrineModule\Form\Element\ObjectSelect',
+           'options' => array(
+                'object_manager'     => $objectManager,
+                'target_class'       => 'DbDoctrine\Entity\Loai',
+                'label' => 'Loại',
+                'value_options' => $this->getLoaiOptions($objectManager)
+            ),
+            'attributes' => array(
+                'required' => 'required'
+            )
+        ));
+    
          $this->add(array(
-             'name' => 'idDonViTinh',
-             'type' => '\Zend\Form\Element\Select',
-             'options' => array(
-                 'label' => 'Chọn Đơn Vị Tính',
-                 'empty_option'=>'----------Chọn Đơn Vị Tính----------',
-                 'disable_inarray_validator' => true,                 
-             ),
-             'attributes'=>array('required'=>'required'),
-         ));
+           'name' => 'idDonViTinh',
+           'type' => 'DoctrineModule\Form\Element\ObjectSelect',
+           'options' => array(
+                'object_manager'     => $objectManager,
+                'target_class'       => 'DbDoctrine\Entity\DonViTinh',
+                'label' => 'Đơn Vị Tính',
+                'value_options' => $this->getDonViTinhOptions($objectManager)
+            ),
+            'attributes' => array(
+                'required' => 'required'
+            )
+        ));
     }
 
     public function getInputFilterSpecification()
     {
-        return array(
-          
+        return array(          
         );
+    }
+
+    public function getLoaiOptions($objectManager)
+    {
+        $options = array();
+        $query = $objectManager->createQuery('select l from DbDoctrine\Entity\Loai l');
+        $mangs = $query->getResult();
+        foreach($mangs as $mang){
+            $options[$mang->getIdLoai()]=$mang->getTenLoai();
+        }
+        return $options;
+    }
+
+    public function getDonViTinhOptions($objectManager)
+    {
+        $options = array();
+        $query = $objectManager->createQuery('select dvt from DbDoctrine\Entity\DonViTinh dvt');
+        $mangs = $query->getResult();
+        foreach($mangs as $mang){
+            $options[$mang->getIdDonViTinh()]=$mang->getTenDonViTinh();
+        }
+        return $options;
     }
 }

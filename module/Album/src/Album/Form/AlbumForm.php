@@ -1,9 +1,9 @@
 <?php
-namespace DbDoctrine\Form;
+namespace Album\Form;
 
 use Zend\Form\Form;
 
- class DbDoctrineForm extends Form
+ class AlbumForm extends Form
  {
      public function __construct($name = null)
      {

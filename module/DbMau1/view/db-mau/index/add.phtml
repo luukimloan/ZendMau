@@ -1,24 +1,21 @@
 <?php
-$title = 'Cập Nhật Sản Phẩm';
-$this->headTitle($title);
-?>
-<h1><?php echo $this->escapeHtml($title); ?></h1>
+ $this->headTitle('Thêm sản phẩm');
 
-<?php
-$sanPham = $this->form->get('san-pham');
-$form->setAttribute('action', $this->url('db_doctrine/crud',array('action' => 'edit','id'=> $this->id,)
-));
-$form->prepare();
-echo $this->form()->openTag($form);
-echo $this->formHidden($sanPham->get('idSanPham'));
+ $form->setAttribute('action', $this->url('db_doctrine/crud', array('action' => 'add')));
+ $form->setAttribute('role','form');
+ $form->prepare();
+ echo $this->form()->openTag($form);
+ $sanPham=$form->get('san-pham'); 
+ echo $this->formHidden($sanPham->get('idSanPham'));
 ?>
+
 <table class="table">
 	<tr>
 		<td>Tên sản phẩm </br>
 			<?php echo $this->formElement($sanPham->get('tenSanPham')); ?></td>
 	</tr>
 	<tr>
-		<td>Đơn vị tính</br>
+		<td>Loại</br>
 			<?php 
 				$donViTinh=$sanPham->get('idDonViTinh');
 				$donViTinh->setValueOptions($this->MakeArrayOptionDonViTinh($donViTinhs));
@@ -27,7 +24,7 @@ echo $this->formHidden($sanPham->get('idSanPham'));
 		</td>
 	</tr>
 	<tr>
-		<td>Loại</br>
+		<td>Đơn vị tính</br>
 			<?php 
 				$loai=$sanPham->get('idLoai');
 				$loai->setValueOptions($this->MakeArrayOptionLoai($loais));

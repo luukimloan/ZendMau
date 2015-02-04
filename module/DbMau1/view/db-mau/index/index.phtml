@@ -31,12 +31,14 @@
 ?>
 
 <?php
+
 $title = 'Sản Phẩm';
 $this->headTitle($title);
+
 ?>
 <h1><?php echo $this->escapeHtml($title); ?></h1>
 <p>
-    <a href="<?php echo $this->url('db_doctrine/crud', array('action'=>'add'));?>">Thêm sản phẩm</a>
+    <a href="<?php echo $this->url('db_mau/crud', array('action'=>'add'));?>">Thêm sản phẩm</a>
 </p>
 
 <table class="table">
@@ -48,9 +50,9 @@ $this->headTitle($title);
 </tr>
 <?php foreach ($sanPhams as $sanPham) : ?>
 <tr>
-    <td><?php echo $sanPham->getTenSanPham(); ?></td>
-    <td><?php echo $sanPham->getIdDonViTinh()->getTenDonViTinh();?></td>
-    <td><?php echo $sanPham->getIdLoai()->getTenLoai();?></td>
+    <td><?php  echo $sanPham->getTenSanPham(); ?></td>
+    <td><?php //echo $sanPham->getIdDonViTinh()->getTenDonViTinh();?></td>
+    <td><?php //echo $sanPham->getIdLoai()->getTenLoai();?></td>
     <td>
         <a href="<?php echo $this->url('db_doctrine/crud',
             array('action'=>'edit', 'id' => $sanPham->getIdSanPham()));?>">Sửa</a>
